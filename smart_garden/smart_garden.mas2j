@@ -18,6 +18,7 @@ MAS smart_garden {
             irrigator;
             monitor;
             pestcontrol;
+            auctioneer;
             
     aslSourcePath: "src/agt";
 }
