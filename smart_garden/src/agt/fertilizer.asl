@@ -1,12 +1,4 @@
-+!startLoop
-   <- .print("Loop started!");
-      !executeLoop.
++percept(receiveVoteForIrrigation(Options)) : true
+   <- .print("Vote casted on Irrigation:", Options[1]);
+      .send(irrigator, tell, vote("I", 5, Options[1])).
 
-+!executeLoop
-   <- .print("Loop execution...");
-      .wait(5000);  // Wait for 5000 milliseconds (5 seconds)
-      !executeLoop.
-
-+percept(recieveVoteForIrrigation(Options)): true
-   <- .print("Vote casted on Irrigation:", Option);
-      sendMessage(irrigation, percept(voteFromAgentB(weight, Chosen))).
