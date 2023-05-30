@@ -1,25 +1,36 @@
-+!startLoop
-   <- .print("Loop started!");
-      !executeLoop.
++!start : true
+   <- .print("Started");
+      [startVotingforIrrigation].
 
-+!executeLoop
-   <- .print("Loop execution...");
-      .wait(5000);  // Wait for 5000 milliseconds (5 seconds)
-      !executeLoop.
-
-+!startVotingforIrrigation : true
++startVotingforIrrigation : true
    <- .print("Irrigation Voting started!");
-      .broadcast(percept(IrrigationvotingOptions(["no", "normal","high"]))).
-      !castVoteforIrrigation(weight, Option).
-      broadcast(percept(voteForIrrigation(weight, Option)))
+      .broadcast(percept(voteForIrrigation(["no", "normal","high"]))).
       
       
++vote("I",weight,Option)  :true   // receives bids and checks for new winner
+   <- countvote(weight,Option);
+      .findall(A,vote("I",V,Opt)[source(A)],L) &
+      .length(L,4); // all 4 expected bids was received
+      findWinner();
+      .abolish(vote("I",_)).
 
-+percept(IrrigationvotingOptions(Options))
-   : true <- .print("Received voting options:", Options).
-
-+!castVoteforIrrigation(Option) : true
-   <- .print("Agent Irrigation casting vote for option:", Option);
-      .addVote(weight, Option)
 
 
++percept(receiveVoteForIrrigation(Options)) : true
+   <- .print("Vote casted on Irrigation:", Options[1]);
+      .send(irrigator, tell, vote("I", 100, Options[1])).
+
+
++findWinner():true
+   <- .findall(Num, vote_count(_, Num), Numlist),
+      .max(Numlist, Max),
+      ?vote_count(Option, Max);
+      .println("Winner is ", Option);
+      abolish(vote_count(_,_)).
+    
+
++countvote(Option, weight) : true
+   <- ?vote_count(Option, Count);
+      NewCount is Count + 1;
+      -vote_count(Option, Count);
+      +vote_count(Option, NewCount).
