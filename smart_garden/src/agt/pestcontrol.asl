@@ -2,11 +2,14 @@
 
 +voteForIrrigation(Options) : true
    <- .print("Vote casted on Irrigation:", Options[2]);
-      .send(irrigator, tell, vote("I", 5, "no")).
+      .send(irrigator, tell, vote("I", 5, "no"));
+      .abolish(voteForIrrigation).
+      
 
-+voteForFertilization(Options) : true    
-	<- .print("Vote casted on Fertilization:", Options[1]);
-		.send(fertilizer, tell, vote("F", 100, Options[1])).
++voteForIrrigation : true
+   <- .print("Vote casted on Irrigation:", "no");
+      .send(irrigator, tell, vote("I", 5, "no"));
+      .abolish(voteForIrrigation).
 
 
 +startVotingforSpraying : true

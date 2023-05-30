@@ -1,14 +1,17 @@
-!start.
+//!start.
 
 //growth(0).
 
 +!start : true
    <- .print("Started");
       .send(irrigator,tell,startVotingforIrrigation).
+      
 
-+voteForIrrigation(Options) : true
-   <- .print("Vote casted on Irrigation:", Options[1]);
-      .send(irrigator, tell, vote("I", 5, Options[1])).
++voteForIrrigation : true
+   <- .print("Vote casted on Irrigation:", "no");
+      .send(irrigator, tell, vote("I", 50, "no"));
+      .abolish(voteForIrrigation).
+      
 
 +voteForFertilization(Options) : true    
 	<- .print("Vote casted on Fertilization:", Options[1]);

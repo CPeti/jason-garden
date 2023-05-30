@@ -65,6 +65,8 @@ public class Env extends Environment {
 	public void updateGarden(){
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
+				
+				
 				double growth = garden[i][j][0];
 				double water = garden[i][j][1];
 				double nutrients = garden[i][j][2];
@@ -105,8 +107,24 @@ public class Env extends Environment {
 				garden[i][j][1] = newWater;
 				garden[i][j][2] = newNutrients;
 				garden[i][j][3] = newPests;
+
+
+			
 			}
 		}
+			belief = Literal.parseLiteral("startVotingforIrrigation");
+			addPercept("irrigator", belief);
+
+			
+			belief = Literal.parseLiteral("growth(" + getAverageParam(0) + ")");
+			addPercept("monitor", belief);
+			belief = Literal.parseLiteral("water(" + getAverageParam(1) + ")");
+			addPercept("irrigator", belief);
+			belief = Literal.parseLiteral("fertilizer(" + getAverageParam(2) + ")");
+			addPercept("fertilizer", belief);
+			belief = Literal.parseLiteral("pests(" + getAverageParam(3) + ")");
+			addPercept("pestcontrol", belief);
+			
 	}
 
 	public class ArrayGridDisplay extends JFrame {
@@ -226,6 +244,10 @@ public class Env extends Environment {
 				for(int t : votesIrrigation){
 					t=0;
 				}
+				belief = Literal.parseLiteral("startVotingforIrrigation");
+				removePercept("irrigator", belief);
+				clearPercepts("irrigator");
+				countervote=0;
 			}
 			return true;
 		} else {

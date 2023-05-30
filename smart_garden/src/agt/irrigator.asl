@@ -1,26 +1,34 @@
 //water(0).
-
+counter(0).
 
 //+water(N) : true
 //	<- -+water(N).
 
 +startVotingforIrrigation : water(N) & N < 0.5
 	<- .print("Irrigation Voting started!");
-      .broadcast(tell, voteForIrrigation(["no", "normal","high"]));
+      .broadcast(tell, voteForIrrigation);
       .print("Vote casted on Irrigation:", "high");
       .send(irrigator, tell, vote("I", 100, "high")).
 
 +startVotingforIrrigation : water(N) & N > 0.5
 	<- .print("Irrigation Voting started!");
-      .broadcast(tell, voteForIrrigation(["no", "normal","high"]));
-      .send(irrigator,tell, voteForIrrigation(["no", "normal","high"]));
+      .broadcast(tell, voteForIrrigation);
 		.print("Vote casted on Irrigation:", "no");
       .send(irrigator, tell, vote("I", 500, "no")).
       
+
++vote("I",Weight,Option)  : counter(A) & A=3
+   <- countvoteIrrigation(Weight, Option);
+		.print("Abolishing!!!!!!", Options[1]);
+		-+counter(A-3);
+		.abolish(vote("I",_,_)[source(_)]).
+
+
 @pb1[atomic]
-+vote("I",Weight,Option)  :true   // receives bids and checks for new winner
-   <- countvoteIrrigation(Weight, Option).
-      
++vote("I",Weight,Option)  : counter(A) & A<3
+   <- countvoteIrrigation(Weight, Option);
+		-+counter(A+1).
+	  
       
 
 +voteForFertilization(Options) : true    

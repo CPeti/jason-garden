@@ -4,7 +4,7 @@
 
 /* Initial goals */
 
-!start.
+//!start.
 
 /* Plans */
 
