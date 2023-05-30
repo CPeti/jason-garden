@@ -1,14 +1,15 @@
 +startVotingforIrrigation : true
    <- .print("Irrigation Voting started!");
-      .broadcast(tell, voteForIrrigation(["no", "normal","high"])).
+      .broadcast(tell, voteForIrrigation(["no", "normal","high"]));
+      .send(irrigator,tell, voteForIrrigation(["no", "normal","high"])).
       
 @pb1[atomic]
 +vote("I",Weight,Option)  :true   // receives bids and checks for new winner
-   <- countvote(5, "no").
-      .findall(A,vote("I",V,Opt)[source(A)],L);
-      .length(L,5); // all 4 expected bids was received
+   <- countvoteIrrigation(5, "no").
+      /*.findall(A,vote("I",V,Opt)[source(A)],L) & .length(L,5); // all 4 expected bids was received
       .print("All bids received");
-      [findWinner].*/
+      [findWinner].
+      */
       
 
 

@@ -21,6 +21,9 @@ public class Env extends Environment {
 	private Logger logger = Logger.getLogger("smart_garden.mas2j." + Env.class.getName());
 	Literal belief;
 
+	private int countervote=0;
+	private int[] votesIrrigation= new int[3];
+
 	public double getAverageParam(int param) {
 		double sum = 0;
 		for (int i = 0; i < gardenSize; i++) {
@@ -203,14 +206,43 @@ public class Env extends Environment {
     } else if (action.getFunctor().equals("run")) {
 			addPercept(Literal.parseLiteral("running"));
 			return true;
-		} else if (action.getFunctor().equals("countvote")) {
+		} else if (action.getFunctor().equals("countvoteIrrigation")) {
 			logger.info("counting votes");
+			logger.info(action.getTerm(0).toString());
+			logger.info(action.getTerm(1).toString());
+			countervote+=1;
+			this.irrigationvote(Integer.parseInt(action.getTerm(0).toString()) , action.getTerm(1).toString());
+			if(countervote==4){
+				int max=0;
+				int maxind=0;
+				for(int i=0;i<3;i++){
+					if(max<=votesIrrigation[i]){
+						max=votesIrrigation[i];
+						maxind=i;
+					}
+					
+				}
+				logger.info("Option index " +maxind +" wins");
+				for(int t : votesIrrigation){
+					t=0;
+				}
+			}
 			return true;
 		} else {
 			logger.info("executing: " + action + ", but not implemented!");
       return false;
     }
   }
+
+  public void irrigationvote(int weight, String option){
+		if(option=="no")	votesIrrigation[0]+=weight;
+		
+		if(option=="normal")votesIrrigation[1]+=weight;
+
+		if(option=="high")votesIrrigation[2]+=weight;
+  }
+
+
 
   /** Called before the end of MAS execution */
   @Override
