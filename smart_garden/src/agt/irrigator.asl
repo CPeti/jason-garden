@@ -7,12 +7,12 @@
       .broadcast(percept(voteForIrrigation(["no", "normal","high"]))).
       
       
-+vote("I",weight,Option)  :true   // receives bids and checks for new winner
-   <- countvote(weight,Option);
++vote("I",Weight,Option)  :true   // receives bids and checks for new winner
+   <- countvote(Weight,Option);
       .findall(A,vote("I",V,Opt)[source(A)],L) &
       .length(L,4); // all 4 expected bids was received
-      findWinner();
-      .abolish(vote("I",_)).
+      [findWinner].
+      
 
 
 
@@ -21,16 +21,20 @@
       .send(irrigator, tell, vote("I", 100, Options[1])).
 
 
-+findWinner():true
-   <- .findall(Num, vote_count(_, Num), Numlist),
-      .max(Numlist, Max),
++findWinner : true
+   <- .findall(Num, vote_count(_, Num), Numlist) &
+      .length(L,4);
+      .max(Numlist, Max);
       ?vote_count(Option, Max);
       .println("Winner is ", Option);
-      abolish(vote_count(_,_)).
+      .abolish(vote_count(_,_));
+      .abolish(vote("I",_,_)).
     
 
-+countvote(Option, weight) : true
++countvote(Option, Weight) : true
    <- ?vote_count(Option, Count);
-      NewCount is Count + 1;
+      NewCount = Count + Weight;
       -vote_count(Option, Count);
       +vote_count(Option, NewCount).
+
+      
