@@ -1,7 +1,3 @@
-+!start : true
-   <- .print("Started");
-      [startVotingforIrrigation].
-
 +startVotingforIrrigation : true
    <- .print("Irrigation Voting started!");
       .broadcast(percept(voteForIrrigation(["no", "normal","high"]))).

@@ -18,6 +18,7 @@ public class Env extends Environment {
 	private int pestTypes = 3;
 	private Random rand = new Random();
 	private ArrayGridDisplay gui;
+	private Logger logger = Logger.getLogger("smart_garden.mas2j." + Env.class.getName());
 	Literal belief;
 
 	public double getAverageParam(int param) {
@@ -203,6 +204,7 @@ public class Env extends Environment {
 			addPercept(Literal.parseLiteral("running"));
 			return true;
 		} else {
+			logger.info("executing: " + action + ", but not implemented!");
       return false;
     }
   }
