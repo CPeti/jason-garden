@@ -1,6 +1,6 @@
 +startVotingforIrrigation : true
    <- .print("Irrigation Voting started!");
-      .broadcast(percept(voteForIrrigation(["no", "normal","high"]))).
+      .broadcast(tell, voteForIrrigation(["no", "normal","high"])).
       
       
 +vote("I",Weight,Option)  :true   // receives bids and checks for new winner
@@ -12,7 +12,7 @@
 
 
 
-+percept(receiveVoteForIrrigation(Options)) : true
++voteForIrrigation(Options) : true
    <- .print("Vote casted on Irrigation:", Options[1]);
       .send(irrigator, tell, vote("I", 100, Options[1])).
 
