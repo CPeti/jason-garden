@@ -1,39 +1,34 @@
-+startVotingforIrrigation : true
-   <- .print("Irrigation Voting started!");
+//water(0).
+
+
+//+water(N) : true
+//	<- -+water(N).
+
++startVotingforIrrigation : water(N) & N < 0.5
+	<- .print("Irrigation Voting started!");
       .broadcast(tell, voteForIrrigation(["no", "normal","high"]));
-      .send(irrigator,tell, voteForIrrigation(["no", "normal","high"])).
+      .print("Vote casted on Irrigation:", "high");
+      .send(irrigator, tell, vote("I", 100, "high")).
+
++startVotingforIrrigation : water(N) & N > 0.5
+	<- .print("Irrigation Voting started!");
+      .broadcast(tell, voteForIrrigation(["no", "normal","high"]));
+      .send(irrigator,tell, voteForIrrigation(["no", "normal","high"]));
+		.print("Vote casted on Irrigation:", "no");
+      .send(irrigator, tell, vote("I", 500, "no")).
       
 @pb1[atomic]
 +vote("I",Weight,Option)  :true   // receives bids and checks for new winner
-   <- countvoteIrrigation(5, "no").
-      /*.findall(A,vote("I",V,Opt)[source(A)],L) & .length(L,5); // all 4 expected bids was received
-      .print("All bids received");
-      [findWinner].
-      */
+   <- countvoteIrrigation(Weight, Option).
+      
       
 
++voteForFertilization(Options) : true    
+	<- .print("Vote casted onFertilization:", Options[1]);
+		.send(fertilizer, tell, vote("F", 100, Options[1])).
 
-
-+voteForIrrigation(Options) : true
-   <- .print("Vote casted on Irrigation:", Options[1]);
-      .send(irrigator, tell, vote("I", 100, Options[1])).
-
-
-+findWinner : true
-   <- .findall(Num, vote_count(_, Num), Numlist) &
-      .length(L,4);
-      .max(Numlist, Max);
-      ?vote_count(Option, Max);
-      .println("Winner is ", Option);
-      .abolish(vote_count(_,_));
-      .abolish(vote("I",_,_)).
-    
-/*
-+countvote(Weight, Option) : true
-   <- .print("counting").
-      ?vote_count(Option, Count);
-      NewCount = Count + Weight;
-      -vote_count(Option, Count);
-      +vote_count(Option, NewCount).*/
++voteForSpraying(Options) : true    
+	<- .print("Vote casted on Spraying:", Options[1]);
+		.send(pestcontrol, tell, vote("S", 100, Options[1])).
 
       
