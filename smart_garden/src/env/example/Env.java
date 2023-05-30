@@ -203,6 +203,9 @@ public class Env extends Environment {
     } else if (action.getFunctor().equals("run")) {
 			addPercept(Literal.parseLiteral("running"));
 			return true;
+		} else if (action.getFunctor().equals("countvote")) {
+			logger.info("counting votes");
+			return true;
 		} else {
 			logger.info("executing: " + action + ", but not implemented!");
       return false;

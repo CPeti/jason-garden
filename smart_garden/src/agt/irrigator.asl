@@ -2,12 +2,13 @@
    <- .print("Irrigation Voting started!");
       .broadcast(tell, voteForIrrigation(["no", "normal","high"])).
       
-      
+@pb1[atomic]
 +vote("I",Weight,Option)  :true   // receives bids and checks for new winner
-   <- countvote(Weight,Option);
-      .findall(A,vote("I",V,Opt)[source(A)],L) &
-      .length(L,4); // all 4 expected bids was received
-      [findWinner].
+   <- countvote(5, "no").
+      .findall(A,vote("I",V,Opt)[source(A)],L);
+      .length(L,5); // all 4 expected bids was received
+      .print("All bids received");
+      [findWinner].*/
       
 
 
@@ -26,11 +27,12 @@
       .abolish(vote_count(_,_));
       .abolish(vote("I",_,_)).
     
-
-+countvote(Option, Weight) : true
-   <- ?vote_count(Option, Count);
+/*
++countvote(Weight, Option) : true
+   <- .print("counting").
+      ?vote_count(Option, Count);
       NewCount = Count + Weight;
       -vote_count(Option, Count);
-      +vote_count(Option, NewCount).
+      +vote_count(Option, NewCount).*/
 
       
