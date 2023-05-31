@@ -1,4 +1,3 @@
-@lbid
 +auction(N)[source(S)] : true
    <- ?growth(G);
       .send(S, tell, place_bid(N,G));

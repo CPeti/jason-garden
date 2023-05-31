@@ -1,4 +1,3 @@
-@lbid
 +auction(N)[source(S)] : true
    <- ?nutrients(Nt);
       .send(S, tell, place_bid(N,Nt));
