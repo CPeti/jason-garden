@@ -9,15 +9,15 @@
 
 +voteForIrrigation : growth(N) & N< 0.2
    <- .print("Vote casted on Irrigation:", "no");
-      .send(irrigator, tell, vote("I", 50, no));
+      .send(irrigator, tell, vote("I", 50, high));
       .abolish(voteForIrrigation).
 
-+voteForIrrigation : growth(N) & N> 0.2 & N < 0.6
++voteForIrrigation : growth(N) & N> 0.2 & N < 0.7
    <- .print("Vote casted on Irrigation:", "no");
-      .send(irrigator, tell, vote("I", 50, no));
+      .send(irrigator, tell, vote("I", 50, normal));
       .abolish(voteForIrrigation).
 
-+voteForIrrigation : growth(N) & N > 0.6
++voteForIrrigation : growth(N) & N > 0.7
    <- .print("Vote casted on Irrigation:", "no");
       .send(irrigator, tell, vote("I", 50, no));
       .abolish(voteForIrrigation).
@@ -25,17 +25,17 @@
 
 +voteForFertilization : growth(N) & N< 0.2
 	<- .print("Vote casted on Fertilization:", "no");
-		.send(fertilizer, tell, vote("F", 12, normal));
+		.send(fertilizer, tell, vote("F", 12, high));
       .abolish(voteForFertilization).
 
 +voteForFertilization :  growth(N) & N> 0.2 & N < 0.6    
 	<- .print("Vote casted on Fertilization:", "no");
-		.send(fertilizer, tell, vote("F", 10, high));
+		.send(fertilizer, tell, vote("F", 10, normal));
       .abolish(voteForFertilization).
 
 +voteForFertilization : growth(N) & N > 0.6    
 	<- .print("Vote casted on Fertilization:", "no");
-		.send(fertilizer, tell, vote("F", 4, high));
+		.send(fertilizer, tell, vote("F", 4, normal));
       .abolish(voteForFertilization).
 
 +voteForSpraying : growth(N) & N< 0.2    

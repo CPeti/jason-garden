@@ -67,10 +67,10 @@ public class Env extends Environment {
 	public void water(int ind){
 		double amount=0;
 		if(ind==1){
-			amount=0.17;
+			amount=0.05;
 		}
 		if(ind==2){
-			amount=0.3;
+			amount=0.1;
 		}
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
@@ -82,10 +82,10 @@ public class Env extends Environment {
 	public void fertilize(int ind){
 		double fertamount=0;
 		if(ind==1){
-			fertamount=0.1;
+			fertamount=0.05;
 		}
 		if(ind==2){
-			fertamount=0.2;
+			fertamount=0.1;
 		}
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
@@ -109,9 +109,9 @@ public class Env extends Environment {
 
 				//type 2 spray kills 20% of pest1 and 90% of pest2, but also reduces growth by 10%
 				if(type == 2){
-					if (garden[i][j][3] == 1 && rand.nextDouble() < 0.2) {
+					if (garden[i][j][3] == 2 && rand.nextDouble() < 0.2) {
 						garden[i][j][3] = 0;
-					} else if (garden[i][j][3] == 2 && rand.nextDouble() < 0.9) {
+					} else if (garden[i][j][3] == 3 && rand.nextDouble() < 0.9) {
 						garden[i][j][3] = 0;
 					}
 					garden[i][j][0] *= 0.9;
@@ -194,7 +194,7 @@ public class Env extends Environment {
 					// chance to kill pests
 					if(pests==1){
 						if(newWater>=0.6){
-							newGrowth*=0.2;
+							newGrowth*=0.3;
 						}
 					}
 					if(pests==2){
@@ -202,7 +202,12 @@ public class Env extends Environment {
 							newGrowth*=0.8;
 							newWater *= 0.8;
 							newNutrients *= 0.8;
+					}
+					if(pests==3){
+						if(newWater<=0.5){   //if water is high this pest has no effect
+							newGrowth*=0.7;
 						}
+					}
 					}
 					
 					if (rand.nextDouble() > growth + water + nutrients) {
@@ -211,7 +216,7 @@ public class Env extends Environment {
 				} else {
 					// change to spawn pests
 					if (rand.nextDouble() < (water * nutrients)) {
-						newPests = rand.nextInt(pestTypes);
+						newPests = rand.nextInt(pestTypes)+1;
 					}
 				}
 
