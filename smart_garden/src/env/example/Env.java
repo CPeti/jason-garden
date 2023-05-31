@@ -23,9 +23,9 @@ public class Env extends Environment {
 	Literal belief;
 
 	private int countervote = 0;
-	private int[] votesIrrigation = new int[3];
-	private int[] votesFertilization = new int[3];
-	private int[] votesSparying = new int[4];
+	private int[] votesIrrigation = new int[]{0,0,0};
+	private int[] votesFertilization = new int[]{0,0,0};
+	private int[] votesSparying = new int[]{0,0,0};
 
 	public double getAverageParam(int param) {
 		double sum = 0;
@@ -59,23 +59,37 @@ public class Env extends Environment {
 		addPercept("irrigator", belief);
 		belief = Literal.parseLiteral("fertilizer(" + getAverageParam(2) + ")");
 		addPercept("fertilizer", belief);
-		belief = Literal.parseLiteral("pests(" + getAverageParam(3) + ")");
+		belief = Literal.parseLiteral("pests(" + getpests() + ")");
 		addPercept("pestcontrol", belief);
 
 	}
 
-	public void water(){
+	public void water(int ind){
+		double amount=0;
+		if(ind==1){
+			amount=0.17;
+		}
+		if(ind==2){
+			amount=0.3;
+		}
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
-				garden[i][j][1] = Math.min(Math.max(garden[i][j][1] + rand.nextDouble()/10 + 0.15, 0), 1);
+				garden[i][j][1] = Math.min(Math.max(garden[i][j][1] + amount, 0), 1);
 			}
 		}
 	}
 
-	public void fertilize(){
+	public void fertilize(int ind){
+		double fertamount=0;
+		if(ind==1){
+			fertamount=0.1;
+		}
+		if(ind==2){
+			fertamount=0.2;
+		}
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
-				garden[i][j][2] = Math.min(Math.max(garden[i][j][2] + rand.nextDouble()/8 + 0.1, 0), 1);
+				garden[i][j][2] = Math.min(Math.max(garden[i][j][2] + fertamount, 0), 1);
 			}
 		}
 	}
@@ -107,6 +121,31 @@ public class Env extends Environment {
 		}
 	}
 
+	public int getpests(){
+		int[] pestcount=new int[]{0,0,0,0};
+		
+		for (int i = 0; i < gardenSize; i++) {
+			for (int j = 0; j < gardenSize; j++) {
+				pestcount[(int)garden[i][j][3]] +=1;
+			}
+		}
+		if(pestcount[0]<gardenSize*gardenSize*0.7){
+			int maxind=1;
+			int max=0;
+			for(int t=1;t<4;t++){
+				if(pestcount[t]>=max){
+					maxind=t;
+					max=pestcount[t];
+				}
+			}
+			return maxind;
+		}
+		else{
+			logger.info(""+pestcount[0]);
+			return 0;
+		}
+	}
+
 	public void updateGarden() {
 		clearPercepts("monitor");
 		clearPercepts("fertilizer");
@@ -118,7 +157,7 @@ public class Env extends Environment {
 		addPercept("irrigator", belief);
 		belief = Literal.parseLiteral("fertilizer(" + getAverageParam(2) + ")");
 		addPercept("fertilizer", belief);
-		belief = Literal.parseLiteral("pests(" + getAverageParam(3) + ")");
+		belief = Literal.parseLiteral("pests(" + getpests() + ")");
 		addPercept("pestcontrol", belief);
 
 		belief = Literal.parseLiteral("startVotingforIrrigation");
@@ -149,10 +188,23 @@ public class Env extends Environment {
 				double newPests = pests;
 				if (pests != 0) {
 
-					newGrowth *= 0.5;
-					newWater *= 0.8;
-					newNutrients *= 0.8;
+					//newGrowth *= 0.5;
+					//newWater *= 0.8;
+					//newNutrients *= 0.8;
 					// chance to kill pests
+					if(pests==1){
+						if(newWater>=0.6){
+							newGrowth*=0.2;
+						}
+					}
+					if(pests==2){
+						if(newNutrients>=0.6){
+							newGrowth*=0.8;
+							newWater *= 0.8;
+							newNutrients *= 0.8;
+						}
+					}
+					
 					if (rand.nextDouble() > growth + water + nutrients) {
 						newPests = 0;
 					}
@@ -222,14 +274,14 @@ public class Env extends Environment {
 			});
 			waterButton = new JButton("Water");
 			waterButton.addActionListener(e -> {
-				water();
+				water(1);
 				// update gui
 				updateGUI();
 				mainPanel.revalidate();
 			});
 			fertilizeButton = new JButton("Fertilize");
 			fertilizeButton.addActionListener(e -> {
-				fertilize();
+				fertilize(1);
 				// update gui
 				updateGUI();
 				mainPanel.revalidate();
@@ -313,7 +365,7 @@ public class Env extends Environment {
 			return true;
 		} else if (action.getFunctor().equals("countvoteIrrigation")) {
 			logger.info("counting votes for irritgation");
-			logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
+			//logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
 			countervote += 1;
 			this.irrigationvote(Integer.parseInt(action.getTerm(0).toString()), action.getTerm(1).toString());
 			if (countervote == 4) {
@@ -324,21 +376,21 @@ public class Env extends Environment {
 						max = votesIrrigation[i];
 						maxind = i;
 					}
-
 				}
 				logger.info("Option index " + maxind + " wins");
-				for (int t : votesIrrigation) {
-					t = 0;
+				this.water(maxind);
+				for (int t=0;t<3;t++) {
+					votesIrrigation[t]=0;
 				}
 				belief = Literal.parseLiteral("startVotingforIrrigation");
 				removePercept("irrigator", belief);
-
+				
 				countervote = 0;
 			}
 			return true;
 		} else if (action.getFunctor().equals("countvoteFertilization")) {
 			logger.info("counting votes for fertilization");
-			logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
+			//logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
 			countervote += 1;
 			this.Fertilizationvote(Integer.parseInt(action.getTerm(0).toString()), action.getTerm(1).toString());
 			if (countervote == 4) {
@@ -352,8 +404,9 @@ public class Env extends Environment {
 
 				}
 				logger.info("Option index " + maxind + " wins");
-				for (int t : votesFertilization) {
-					t = 0;
+				this.fertilize(maxind);
+				for (int t=0;t<3;t++) {
+					votesFertilization[t]=0;
 				}
 
 				countervote = 0;
@@ -362,7 +415,7 @@ public class Env extends Environment {
 			return true;
 		} else if (action.getFunctor().equals("countvoteSpraying")) {
 			logger.info("counting votes for Spraying");
-			logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
+			//logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
 			countervote += 1;
 			this.Sprayingvote(Integer.parseInt(action.getTerm(0).toString()), action.getTerm(1).toString());
 			if (countervote == 4) {
@@ -372,12 +425,14 @@ public class Env extends Environment {
 					if (max <= votesSparying[i]) {
 						max = votesSparying[i];
 						maxind = i;
+						logger.info("i értéke:"+max);
 					}
 
 				}
 				logger.info("Option index " + maxind + " wins");
-				for (int t : votesSparying) {
-					t = 0;
+				this.spray(maxind);
+				for (int t=0;t<3;t++) {
+					votesSparying[t]=0;
 				}
 				belief = Literal.parseLiteral("startVotingforIrrigation");
 				countervote = 0;
@@ -393,39 +448,37 @@ public class Env extends Environment {
 	}
 
 	public void irrigationvote(int weight, String option) {
-		if (option == "no")
+		if (option.equals("no"))
 			votesIrrigation[0] += weight;
 
-		if (option == "normal")
+		if (option.equals("normal"))
 			votesIrrigation[1] += weight;
 
-		if (option == "high")
+		if (option.equals("high"))
 			votesIrrigation[2] += weight;
 	}
 
 	public void Fertilizationvote(int weight, String option) {
-		if (option == "no")
+		
+		if (option.equals( "no"))
 			votesFertilization[0] += weight;
 
-		if (option == "normal")
+		if (option.equals("normal"))
 			votesFertilization[1] += weight;
 
-		if (option == "high")
+		if (option.equals("high"))
 			votesFertilization[2] += weight;
 	}
 
 	public void Sprayingvote(int weight, String option) {
-		if (option == "no")
-			votesIrrigation[0] += weight;
+		if (option.equals("no"))
+			votesSparying[0] += weight;
 
-		if (option == "pest1")
-			votesIrrigation[1] += weight;
+		if (option.equals("pest1"))
+			votesSparying[1] += weight;
 
-		if (option == "pest2")
-			votesIrrigation[2] += weight;
-
-		if (option == "pest3")
-			votesIrrigation[3] += weight;
+		if (option.equals("pest2"))
+			votesSparying[2] += weight;
 	}
 
 	/** Called before the end of MAS execution */
