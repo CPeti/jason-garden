@@ -64,6 +64,49 @@ public class Env extends Environment {
 
 	}
 
+	public void water(){
+		for (int i = 0; i < gardenSize; i++) {
+			for (int j = 0; j < gardenSize; j++) {
+				garden[i][j][1] = Math.min(Math.max(garden[i][j][1] + rand.nextDouble()/10 + 0.15, 0), 1);
+			}
+		}
+	}
+
+	public void fertilize(){
+		for (int i = 0; i < gardenSize; i++) {
+			for (int j = 0; j < gardenSize; j++) {
+				garden[i][j][2] = Math.min(Math.max(garden[i][j][2] + rand.nextDouble()/8 + 0.1, 0), 1);
+			}
+		}
+	}
+
+	public void spray(int type){
+		for (int i = 0; i < gardenSize; i++) {
+			for (int j = 0; j < gardenSize; j++) {
+				//type 1 spray kills 80% of pest1 and 50% of pest2, but also reduces growth by 30%
+				if(type == 1){
+					if (garden[i][j][3] == 1 && rand.nextDouble() < 0.8) {
+						garden[i][j][3] = 0;
+					} else if (garden[i][j][3] == 2 && rand.nextDouble() < 0.5) {
+						garden[i][j][3] = 0;
+					}
+					garden[i][j][0] *= 0.7;
+				}
+
+				//type 2 spray kills 20% of pest1 and 90% of pest2, but also reduces growth by 10%
+				if(type == 2){
+					if (garden[i][j][3] == 1 && rand.nextDouble() < 0.2) {
+						garden[i][j][3] = 0;
+					} else if (garden[i][j][3] == 2 && rand.nextDouble() < 0.9) {
+						garden[i][j][3] = 0;
+					}
+					garden[i][j][0] *= 0.9;
+				}
+				
+			}
+		}
+	}
+
 	public void updateGarden() {
 		clearPercepts("monitor");
 		clearPercepts("fertilizer");
@@ -133,6 +176,11 @@ public class Env extends Environment {
 	public class ArrayGridDisplay extends JFrame {
 		private final int cellSize = 80;
 		private JButton simButton;
+		private JButton waterButton;
+		private JButton fertilizeButton;
+		private JButton spray1Button;
+		private JButton spray2Button;
+		private JPanel buttonPanel;
 		private JPanel mainPanel = new JPanel();
 		private JPanel cellContainerPanel = new JPanel();
 		// array of colors
@@ -172,7 +220,42 @@ public class Env extends Environment {
 				updateGUI();
 				mainPanel.revalidate();
 			});
-			mainPanel.add(simButton);
+			waterButton = new JButton("Water");
+			waterButton.addActionListener(e -> {
+				water();
+				// update gui
+				updateGUI();
+				mainPanel.revalidate();
+			});
+			fertilizeButton = new JButton("Fertilize");
+			fertilizeButton.addActionListener(e -> {
+				fertilize();
+				// update gui
+				updateGUI();
+				mainPanel.revalidate();
+			});
+			spray1Button = new JButton("Spray 1");
+			spray1Button.addActionListener(e -> {
+				spray(1);
+				// update gui
+				updateGUI();
+				mainPanel.revalidate();
+			});
+			spray2Button = new JButton("Spray 2");
+			spray2Button.addActionListener(e -> {
+				spray(2);
+				// update gui
+				updateGUI();
+				mainPanel.revalidate();
+			});
+			buttonPanel = new JPanel();
+			buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+			buttonPanel.add(simButton);
+			buttonPanel.add(waterButton);
+			buttonPanel.add(fertilizeButton);
+			buttonPanel.add(spray1Button);
+			buttonPanel.add(spray2Button);
+			mainPanel.add(buttonPanel);
 			mainPanel.add(cellContainerPanel);
 			add(mainPanel);
 			pack();
