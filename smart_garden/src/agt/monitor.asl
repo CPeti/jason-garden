@@ -13,10 +13,12 @@
       .abolish(voteForIrrigation).
       
 
-+voteForFertilization(Options) : true    
-	<- .print("Vote casted on Fertilization:", Options[1]);
-		.send(fertilizer, tell, vote("F", 100, Options[1])).
++voteForFertilization : true    
+	<- .print("Vote casted on Fertilization:", "no");
+		.send(fertilizer, tell, vote("F", 100, "no"));
+      .abolish(voteForFertilization).
 
-+voteForSpraying(Options) : true    
-	<- .print("Vote casted on Spraying:", Options[1]);
-		.send(pestcontrol, tell, vote("S", 100, Options[1])).
++voteForSpraying : true    
+	<- .print("Vote casted on Spraying:","no");
+		.send(pestcontrol, tell, vote("S", 100, "no"));
+      .abolish(voteForSpraying).

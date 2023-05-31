@@ -23,6 +23,8 @@ public class Env extends Environment {
 
 	private int countervote=0;
 	private int[] votesIrrigation= new int[3];
+	private int[] votesFertilization= new int[3];
+	private int[] votesSparying= new int[4];
 
 	public double getAverageParam(int param) {
 		double sum = 0;
@@ -63,6 +65,22 @@ public class Env extends Environment {
 	}
 
 	public void updateGarden(){
+		clearPercepts("monitor");
+		clearPercepts("fertilizer");
+		clearPercepts("irrigator");
+		clearPercepts("pestcontrol");
+		belief = Literal.parseLiteral("growth(" + getAverageParam(0) + ")");
+		addPercept("monitor", belief);
+		belief = Literal.parseLiteral("water(" + getAverageParam(1) + ")");
+		addPercept("irrigator", belief);
+		belief = Literal.parseLiteral("fertilizer(" + getAverageParam(2) + ")");
+		addPercept("fertilizer", belief);
+		belief = Literal.parseLiteral("pests(" + getAverageParam(3) + ")");
+		addPercept("pestcontrol", belief);
+		
+		belief = Literal.parseLiteral("startVotingforIrrigation");
+		addPercept("irrigator", belief);
+		
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
 				
@@ -112,18 +130,10 @@ public class Env extends Environment {
 			
 			}
 		}
-			belief = Literal.parseLiteral("startVotingforIrrigation");
-			addPercept("irrigator", belief);
+			
 
 			
-			belief = Literal.parseLiteral("growth(" + getAverageParam(0) + ")");
-			addPercept("monitor", belief);
-			belief = Literal.parseLiteral("water(" + getAverageParam(1) + ")");
-			addPercept("irrigator", belief);
-			belief = Literal.parseLiteral("fertilizer(" + getAverageParam(2) + ")");
-			addPercept("fertilizer", belief);
-			belief = Literal.parseLiteral("pests(" + getAverageParam(3) + ")");
-			addPercept("pestcontrol", belief);
+			
 			
 	}
 
@@ -225,9 +235,8 @@ public class Env extends Environment {
 			addPercept(Literal.parseLiteral("running"));
 			return true;
 		} else if (action.getFunctor().equals("countvoteIrrigation")) {
-			logger.info("counting votes");
-			logger.info(action.getTerm(0).toString());
-			logger.info(action.getTerm(1).toString());
+			logger.info("counting votes for irritgation");
+			logger.info(action.getTerm(0).toString()+" "+action.getTerm(1).toString());
 			countervote+=1;
 			this.irrigationvote(Integer.parseInt(action.getTerm(0).toString()) , action.getTerm(1).toString());
 			if(countervote==4){
@@ -246,11 +255,67 @@ public class Env extends Environment {
 				}
 				belief = Literal.parseLiteral("startVotingforIrrigation");
 				removePercept("irrigator", belief);
-				clearPercepts("irrigator");
+				
 				countervote=0;
 			}
 			return true;
-		} else {
+		}
+		else if (action.getFunctor().equals("countvoteFertilization")){
+			logger.info("counting votes for fertilization");
+			logger.info(action.getTerm(0).toString()+" "+action.getTerm(1).toString());
+			countervote+=1;
+			this.Fertilizationvote(Integer.parseInt(action.getTerm(0).toString()) , action.getTerm(1).toString());
+			if(countervote==4){
+				int max=0;
+				int maxind=0;
+				for(int i=0;i<3;i++){
+					if(max<=votesFertilization[i]){
+						max=votesFertilization[i];
+						maxind=i;
+					}
+					
+				}
+				logger.info("Option index " +maxind +" wins");
+				for(int t : votesFertilization){
+					t=0;
+				}
+				
+				countervote=0;
+			}
+			
+			
+			return true;
+		}
+		else if (action.getFunctor().equals("countvoteSpraying")){
+			logger.info("counting votes for Spraying");
+			logger.info(action.getTerm(0).toString()+" "+action.getTerm(1).toString());
+			countervote+=1;
+			this.Sprayingvote(Integer.parseInt(action.getTerm(0).toString()) , action.getTerm(1).toString());
+			if(countervote==4){
+				int max=0;
+				int maxind=0;
+				for(int i=0;i<3;i++){
+					if(max<=votesSparying[i]){
+						max=votesSparying[i];
+						maxind=i;
+					}
+					
+				}
+				logger.info("Option index " +maxind +" wins");
+				for(int t : votesSparying){
+					t=0;
+				}
+				belief = Literal.parseLiteral("startVotingforIrrigation");
+				countervote=0;
+			}
+			belief = Literal.parseLiteral("startVotingforIrrigation");
+			removePercept("irrigator", belief);
+			
+			
+			
+			return true;
+		}
+		else {
 			logger.info("executing: " + action + ", but not implemented!");
       return false;
     }
@@ -263,6 +328,24 @@ public class Env extends Environment {
 
 		if(option=="high")votesIrrigation[2]+=weight;
   }
+
+  public void Fertilizationvote(int weight, String option){
+	if(option=="no")	votesFertilization[0]+=weight;
+	
+	if(option=="normal")votesFertilization[1]+=weight;
+
+	if(option=="high")votesFertilization[2]+=weight;
+}
+
+public void Sprayingvote(int weight, String option){
+	if(option=="no")	votesIrrigation[0]+=weight;
+	
+	if(option=="pest1")votesIrrigation[1]+=weight;
+
+	if(option=="pest2")votesIrrigation[2]+=weight;
+
+	if(option=="pest3")votesIrrigation[3]+=weight;
+}
 
 
 
