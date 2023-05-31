@@ -11,20 +11,21 @@ import java.awt.*;
 import java.text.DecimalFormat;
 
 public class Env extends Environment {
-  /** Called before the MAS execution with the args informed in .mas2j */
+	/** Called before the MAS execution with the args informed in .mas2j */
 	private final int gardenSize = 10;
 	private final int paramSize = 4;
-	private double[][][] garden = new double[gardenSize][gardenSize][paramSize]; // 0: plant growth, 1: water, 2: nutrients, 3: pests
+	private double[][][] garden = new double[gardenSize][gardenSize][paramSize]; // 0: plant growth, 1: water, 2:
+																					// nutrients, 3: pests
 	private int pestTypes = 3;
 	private Random rand = new Random();
 	private ArrayGridDisplay gui;
 	private Logger logger = Logger.getLogger("smart_garden.mas2j." + Env.class.getName());
 	Literal belief;
 
-	private int countervote=0;
-	private int[] votesIrrigation= new int[3];
-	private int[] votesFertilization= new int[3];
-	private int[] votesSparying= new int[4];
+	private int countervote = 0;
+	private int[] votesIrrigation = new int[3];
+	private int[] votesFertilization = new int[3];
+	private int[] votesSparying = new int[4];
 
 	public double getAverageParam(int param) {
 		double sum = 0;
@@ -36,9 +37,9 @@ public class Env extends Environment {
 		return sum / (gardenSize * gardenSize);
 	}
 
-  @Override
-  public void init(String[] args) {
-		//initialize garden
+	@Override
+	public void init(String[] args) {
+		// initialize garden
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
 				for (int k = 0; k < paramSize; k++) {
@@ -52,7 +53,6 @@ public class Env extends Environment {
 		}
 		gui = new ArrayGridDisplay();
 
-
 		belief = Literal.parseLiteral("growth(" + getAverageParam(0) + ")");
 		addPercept("monitor", belief);
 		belief = Literal.parseLiteral("water(" + getAverageParam(1) + ")");
@@ -64,7 +64,7 @@ public class Env extends Environment {
 
 	}
 
-	public void updateGarden(){
+	public void updateGarden() {
 		clearPercepts("monitor");
 		clearPercepts("fertilizer");
 		clearPercepts("irrigator");
@@ -77,78 +77,72 @@ public class Env extends Environment {
 		addPercept("fertilizer", belief);
 		belief = Literal.parseLiteral("pests(" + getAverageParam(3) + ")");
 		addPercept("pestcontrol", belief);
-		
+
 		belief = Literal.parseLiteral("startVotingforIrrigation");
 		addPercept("irrigator", belief);
-		
+
 		for (int i = 0; i < gardenSize; i++) {
 			for (int j = 0; j < gardenSize; j++) {
-				
-				
+
 				double growth = garden[i][j][0];
 				double water = garden[i][j][1];
 				double nutrients = garden[i][j][2];
 				double pests = garden[i][j][3];
 
-				//update growth
+				// update growth
 				double newGrowth = growth * 0.8 + Math.min((growth + 0.1) * 0.4, Math.min(water, nutrients));
 				newGrowth = Math.min(Math.max(newGrowth, 0), 1);
 
-				//update water
-				double newWater = water - Math.max(newGrowth - growth, 0)/2 - growth / 8 + (rand.nextGaussian() + 1) / 20;
+				// update water
+				double newWater = water - Math.max(newGrowth - growth, 0) / 2 - growth / 8
+						+ (rand.nextGaussian() + 1) / 20;
 				newWater = Math.min(Math.max(newWater, 0), 1);
-				
-				//update nutrients
-				double newNutrients = nutrients - Math.max(newGrowth - growth, 0)/2 - growth / 8 + (rand.nextGaussian() + 1) / 20;
+
+				// update nutrients
+				double newNutrients = nutrients - Math.max(newGrowth - growth, 0) / 2 - growth / 8
+						+ (rand.nextGaussian() + 1) / 20;
 				newNutrients = Math.min(Math.max(newNutrients, 0), 1);
 
 				double newPests = pests;
 				if (pests != 0) {
-					
+
 					newGrowth *= 0.5;
 					newWater *= 0.8;
 					newNutrients *= 0.8;
-					// 10% chance to kill pests
-					if (rand.nextInt(100) < 10) {
+					// chance to kill pests
+					if (rand.nextDouble() > growth + water + nutrients) {
 						newPests = 0;
 					}
 				} else {
-					// 5% change to spawn pests
-					if (rand.nextInt(100) < 5) {
+					// change to spawn pests
+					if (rand.nextDouble() < (water * nutrients)) {
 						newPests = rand.nextInt(pestTypes);
 					}
 				}
-
-				
 
 				garden[i][j][0] = newGrowth;
 				garden[i][j][1] = newWater;
 				garden[i][j][2] = newNutrients;
 				garden[i][j][3] = newPests;
 
-
-			
 			}
 		}
-			
 
-			
-			
-			
 	}
 
 	public class ArrayGridDisplay extends JFrame {
-    private final int cellSize = 80;
+		private final int cellSize = 80;
 		private JButton simButton;
 		private JPanel mainPanel = new JPanel();
 		private JPanel cellContainerPanel = new JPanel();
-		//array of colors
-		private Color[] colors = {Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW}; 
+		// array of colors
+		private Color[] colors = { Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW };
 		private Border border = BorderFactory.createLineBorder(Color.WHITE, 1);
 		private DecimalFormat decimalFormat = new DecimalFormat("#.###");
-    public ArrayGridDisplay() {
-        initializeUI();
-    }
+
+		public ArrayGridDisplay() {
+			initializeUI();
+		}
 
 		public static Color scaleColor(Color originalColor, double scale) {
 			int red = (int) Math.round(originalColor.getRed() * scale);
@@ -163,28 +157,28 @@ public class Env extends Environment {
 			return new Color(red, green, blue);
 		}
 
-    private void initializeUI() {
-        setTitle("Array Grid Display");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
+		private void initializeUI() {
+			setTitle("Array Grid Display");
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			setResizable(false);
 
-        cellContainerPanel.setLayout(new GridLayout(gardenSize, gardenSize));
+			cellContainerPanel.setLayout(new GridLayout(gardenSize, gardenSize));
 
-        updateGUI();
-				simButton = new JButton("Simulate");
-				simButton.addActionListener(e -> {
-					updateGarden();
-					//update gui
-					updateGUI();
-					mainPanel.revalidate();
-				});
-				mainPanel.add(simButton);
-				mainPanel.add(cellContainerPanel);
-        add(mainPanel);
-        pack();
-        setLocationRelativeTo(null); // Center the frame on the screen
-        setVisible(true);
-    }
+			updateGUI();
+			simButton = new JButton("Simulate");
+			simButton.addActionListener(e -> {
+				updateGarden();
+				// update gui
+				updateGUI();
+				mainPanel.revalidate();
+			});
+			mainPanel.add(simButton);
+			mainPanel.add(cellContainerPanel);
+			add(mainPanel);
+			pack();
+			setLocationRelativeTo(null); // Center the frame on the screen
+			setVisible(true);
+		}
 
 		public void updateGUI() {
 			cellContainerPanel.removeAll();
@@ -196,13 +190,13 @@ public class Env extends Environment {
 					cellPanel.setLayout(new GridLayout(2, 2));
 					cellPanel.setBorder(border);
 
-					for (int k = 0; k < 4; k++){
+					for (int k = 0; k < 4; k++) {
 						JLabel numberLabel = new JLabel(decimalFormat.format(garden[i][j][k]), SwingConstants.CENTER);
 						JPanel cellSubPanel = new JPanel();
 						cellSubPanel.setPreferredSize(new Dimension(cellSize / 2, cellSize / 2));
 						cellSubPanel.setLayout(new BorderLayout());
 						numberLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 10));
-						//numberLabel.setForeground(colors[k]);
+						// numberLabel.setForeground(colors[k]);
 						cellSubPanel.add(numberLabel);
 						if (k == 3) {
 							if (garden[i][j][k] == 0) {
@@ -226,132 +220,134 @@ public class Env extends Environment {
 		}
 	}
 
-  @Override
-  public boolean executeAction(String agName, Structure action) {
-    if (action.getFunctor().equals("burn")) {
-      addPercept(Literal.parseLiteral("fire"));
-      return true;
-    } else if (action.getFunctor().equals("run")) {
+	@Override
+	public boolean executeAction(String agName, Structure action) {
+		if (action.getFunctor().equals("burn")) {
+			addPercept(Literal.parseLiteral("fire"));
+			return true;
+		} else if (action.getFunctor().equals("run")) {
 			addPercept(Literal.parseLiteral("running"));
 			return true;
 		} else if (action.getFunctor().equals("countvoteIrrigation")) {
 			logger.info("counting votes for irritgation");
-			logger.info(action.getTerm(0).toString()+" "+action.getTerm(1).toString());
-			countervote+=1;
-			this.irrigationvote(Integer.parseInt(action.getTerm(0).toString()) , action.getTerm(1).toString());
-			if(countervote==4){
-				int max=0;
-				int maxind=0;
-				for(int i=0;i<3;i++){
-					if(max<=votesIrrigation[i]){
-						max=votesIrrigation[i];
-						maxind=i;
+			logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
+			countervote += 1;
+			this.irrigationvote(Integer.parseInt(action.getTerm(0).toString()), action.getTerm(1).toString());
+			if (countervote == 4) {
+				int max = 0;
+				int maxind = 0;
+				for (int i = 0; i < 3; i++) {
+					if (max <= votesIrrigation[i]) {
+						max = votesIrrigation[i];
+						maxind = i;
 					}
-					
+
 				}
-				logger.info("Option index " +maxind +" wins");
-				for(int t : votesIrrigation){
-					t=0;
+				logger.info("Option index " + maxind + " wins");
+				for (int t : votesIrrigation) {
+					t = 0;
 				}
 				belief = Literal.parseLiteral("startVotingforIrrigation");
 				removePercept("irrigator", belief);
-				
-				countervote=0;
+
+				countervote = 0;
 			}
 			return true;
-		}
-		else if (action.getFunctor().equals("countvoteFertilization")){
+		} else if (action.getFunctor().equals("countvoteFertilization")) {
 			logger.info("counting votes for fertilization");
-			logger.info(action.getTerm(0).toString()+" "+action.getTerm(1).toString());
-			countervote+=1;
-			this.Fertilizationvote(Integer.parseInt(action.getTerm(0).toString()) , action.getTerm(1).toString());
-			if(countervote==4){
-				int max=0;
-				int maxind=0;
-				for(int i=0;i<3;i++){
-					if(max<=votesFertilization[i]){
-						max=votesFertilization[i];
-						maxind=i;
+			logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
+			countervote += 1;
+			this.Fertilizationvote(Integer.parseInt(action.getTerm(0).toString()), action.getTerm(1).toString());
+			if (countervote == 4) {
+				int max = 0;
+				int maxind = 0;
+				for (int i = 0; i < 3; i++) {
+					if (max <= votesFertilization[i]) {
+						max = votesFertilization[i];
+						maxind = i;
 					}
-					
+
 				}
-				logger.info("Option index " +maxind +" wins");
-				for(int t : votesFertilization){
-					t=0;
+				logger.info("Option index " + maxind + " wins");
+				for (int t : votesFertilization) {
+					t = 0;
 				}
-				
-				countervote=0;
+
+				countervote = 0;
 			}
-			
-			
+
 			return true;
-		}
-		else if (action.getFunctor().equals("countvoteSpraying")){
+		} else if (action.getFunctor().equals("countvoteSpraying")) {
 			logger.info("counting votes for Spraying");
-			logger.info(action.getTerm(0).toString()+" "+action.getTerm(1).toString());
-			countervote+=1;
-			this.Sprayingvote(Integer.parseInt(action.getTerm(0).toString()) , action.getTerm(1).toString());
-			if(countervote==4){
-				int max=0;
-				int maxind=0;
-				for(int i=0;i<3;i++){
-					if(max<=votesSparying[i]){
-						max=votesSparying[i];
-						maxind=i;
+			logger.info(action.getTerm(0).toString() + " " + action.getTerm(1).toString());
+			countervote += 1;
+			this.Sprayingvote(Integer.parseInt(action.getTerm(0).toString()), action.getTerm(1).toString());
+			if (countervote == 4) {
+				int max = 0;
+				int maxind = 0;
+				for (int i = 0; i < 3; i++) {
+					if (max <= votesSparying[i]) {
+						max = votesSparying[i];
+						maxind = i;
 					}
-					
+
 				}
-				logger.info("Option index " +maxind +" wins");
-				for(int t : votesSparying){
-					t=0;
+				logger.info("Option index " + maxind + " wins");
+				for (int t : votesSparying) {
+					t = 0;
 				}
 				belief = Literal.parseLiteral("startVotingforIrrigation");
-				countervote=0;
+				countervote = 0;
 			}
 			belief = Literal.parseLiteral("startVotingforIrrigation");
 			removePercept("irrigator", belief);
-			
-			
-			
+
 			return true;
-		}
-		else {
+		} else {
 			logger.info("executing: " + action + ", but not implemented!");
-      return false;
-    }
-  }
+			return false;
+		}
+	}
 
-  public void irrigationvote(int weight, String option){
-		if(option=="no")	votesIrrigation[0]+=weight;
-		
-		if(option=="normal")votesIrrigation[1]+=weight;
+	public void irrigationvote(int weight, String option) {
+		if (option == "no")
+			votesIrrigation[0] += weight;
 
-		if(option=="high")votesIrrigation[2]+=weight;
-  }
+		if (option == "normal")
+			votesIrrigation[1] += weight;
 
-  public void Fertilizationvote(int weight, String option){
-	if(option=="no")	votesFertilization[0]+=weight;
-	
-	if(option=="normal")votesFertilization[1]+=weight;
+		if (option == "high")
+			votesIrrigation[2] += weight;
+	}
 
-	if(option=="high")votesFertilization[2]+=weight;
-}
+	public void Fertilizationvote(int weight, String option) {
+		if (option == "no")
+			votesFertilization[0] += weight;
 
-public void Sprayingvote(int weight, String option){
-	if(option=="no")	votesIrrigation[0]+=weight;
-	
-	if(option=="pest1")votesIrrigation[1]+=weight;
+		if (option == "normal")
+			votesFertilization[1] += weight;
 
-	if(option=="pest2")votesIrrigation[2]+=weight;
+		if (option == "high")
+			votesFertilization[2] += weight;
+	}
 
-	if(option=="pest3")votesIrrigation[3]+=weight;
-}
+	public void Sprayingvote(int weight, String option) {
+		if (option == "no")
+			votesIrrigation[0] += weight;
 
+		if (option == "pest1")
+			votesIrrigation[1] += weight;
 
+		if (option == "pest2")
+			votesIrrigation[2] += weight;
 
-  /** Called before the end of MAS execution */
-  @Override
-  public void stop() {
-    super.stop();
-  }
+		if (option == "pest3")
+			votesIrrigation[3] += weight;
+	}
+
+	/** Called before the end of MAS execution */
+	@Override
+	public void stop() {
+		super.stop();
+	}
 }

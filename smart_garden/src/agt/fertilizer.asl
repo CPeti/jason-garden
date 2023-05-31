@@ -23,7 +23,6 @@ counter2(0).
 
 +vote("F",Weight,Option)  : counter2(A) & A=3
    <- countvoteFertilization(Weight, Option);
-		.print("Abolishing fertil!!!!!!");
 		-+counter2(A-3);
 		.abolish(vote("F",_,_)[source(_)]);
 		.send(pestcontrol,tell,startVotingforSpraying).

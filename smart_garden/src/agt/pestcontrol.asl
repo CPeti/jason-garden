@@ -18,7 +18,6 @@ counter(0).
 
 +vote("S",Weight,Option)  : counter(A) & A=3
    <- countvoteSpraying(Weight, Option);
-		.print("Abolishing spraying!!!!!!");
 		-+counter(A-3);
 		.abolish(vote("S",_,_)[source(_)]).
 

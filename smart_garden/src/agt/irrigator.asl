@@ -19,7 +19,6 @@ counter1(0).
 
 +vote("I",Weight,Option)  : counter1(A) & A=3
    <- countvoteIrrigation(Weight, Option);
-	  .print("Abolishing irri!!!!!!");
 	  -+counter1(A-3);
 	  .abolish(vote("I",_,_)[source(_)]);
 	  .send(fertilizer,tell,startVotingforFertilization).
