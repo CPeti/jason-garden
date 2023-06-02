@@ -265,6 +265,9 @@ public class Env extends Environment {
 			initializeUI();
 		}
 
+		public void setsimulbtn(boolean b){
+			simButton.setEnabled(b);	
+		}
 		public static Color scaleColor(Color originalColor, double scale) {
 			int red = (int) Math.round(originalColor.getRed() * scale);
 			int green = (int) Math.round(originalColor.getGreen() * scale);
@@ -288,19 +291,14 @@ public class Env extends Environment {
 			updateGUI();
 			simButton = new JButton("Simulate");
 			simButton.addActionListener(e -> {
+				simButton.setEnabled(false);
 				
-				lock.lock();
-				try{
+				
 					shouldSignal=false;
 					updateGarden();
 					updateGUI();
 					mainPanel.revalidate();
 					
-				}
-				finally{
-					lock.unlock();
-					logger.info("unlocked");
-				}
 				// update gui
 				
 			});
@@ -466,9 +464,8 @@ public class Env extends Environment {
 				
 				belief = Literal.parseLiteral("startVotingforIrrigation");
 				removePercept("irrigator", belief);
-				lefutott=true;
-				shouldSignal=true;
-				condition.signal();
+				
+				gui.setsimulbtn(true);
 				logger.info("done");
 			}
 
