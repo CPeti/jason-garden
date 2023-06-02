@@ -8,19 +8,19 @@ counter1(0).
 	<- .print("Irrigation Voting started!");
        .broadcast(tell, voteForIrrigation);
        .print("Vote casted on Irrigation:", "high");
-       .send(irrigator, tell, vote("I", 100, high)).
+       .send(irrigator, tell, vote("I", 10, high)).
 
 +startVotingforIrrigation : water(N) & N > 0.7
 	<- .print("Irrigation Voting started!");
        .broadcast(tell, voteForIrrigation);
 	   .print("Vote casted on Irrigation:", "no");
-       .send(irrigator, tell, vote("I", 500,no)).
+       .send(irrigator, tell, vote("I", 13,no)).
 
 +startVotingforIrrigation : water(N) & N >= 0.35 & N <= 0.70 
 	<- .print("Irrigation Voting started!");
        .broadcast(tell, voteForIrrigation);
-	   .print("Vote casted on Irrigation:", "no");
-       .send(irrigator, tell, vote("I", 500, no)).
+	   .print("Vote casted on Irrigation:", "normal");
+       .send(irrigator, tell, vote("I", 10, normal)).
       
 
 +vote("I",Weight,Option)  : counter1(A) & A=3
@@ -38,18 +38,18 @@ counter1(0).
       
 
 +voteForFertilization :   water(N) & N < 0.35   
-	<- .print("Vote casted onFertilization:", "no");
-	   .send(fertilizer, tell, vote("F", 2, normal));
+	<- .print("Vote casted onFertilization:", "high");
+	   .send(fertilizer, tell, vote("F", 7, high));
 	   .abolish(voteForFertilization).
 
 +voteForFertilization : water(N) & N > 0.7     
 	<- .print("Vote casted onFertilization:", "no");
-	   .send(fertilizer, tell, vote("F", 10, high));
+	   .send(fertilizer, tell, vote("F", 7, no));
 	   .abolish(voteForFertilization).
 
 +voteForFertilization : water(N) & N >= 0.35 & N <= 0.70     
-	<- .print("Vote casted onFertilization:", "no");
-	   .send(fertilizer, tell, vote("F", 10, normal));
+	<- .print("Vote casted onFertilization:", "normal");
+	   .send(fertilizer, tell, vote("F", 4, normal));
 	   .abolish(voteForFertilization).
 
 
