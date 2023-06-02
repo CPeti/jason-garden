@@ -115,14 +115,14 @@ public class Env extends Environment {
 					garden[i][j][0] *= 0.7;
 				}
 
-				//type 2 spray kills 40% of pest2 and 90% of pest3, but also reduces growth by 10%
+				//type 2 spray kills 40% of pest2 and 90% of pest3, but also reduces growth by 20%
 				if(type == 2){
 					if (garden[i][j][3] == 2 && rand.nextDouble() < 0.4) {
 						garden[i][j][3] = 0;
 					} else if (garden[i][j][3] == 3 && rand.nextDouble() < 0.9) {
 						garden[i][j][3] = 0;
 					}
-					garden[i][j][0] *= 0.9;
+					garden[i][j][0] *= 0.8;
 				}
 				if(type==4){
 					if (garden[i][j][3] == 2) {
